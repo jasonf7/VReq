@@ -79,7 +79,8 @@ textarea {
    Author's custom styles
    ========================================================================== */
 .axis text {
-  font: 10px sans-serif;
+  font-weight: bold;
+  font: 20px sans-serif;
 }
 .axis path,
 .axis line {
@@ -89,10 +90,21 @@ textarea {
   shape-rendering: crispEdges;
 }
 
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 5px;
+}
+
+.node text { 
+    font-weight: bold;
+    font: 17px sans-serif; 
+}
+
 .link {
   fill: none;
   stroke: #ccc;
-  stroke-width: 4.5px;
+  stroke-width: 7px;
 }
 
 .node {
