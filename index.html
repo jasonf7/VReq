@@ -25,59 +25,9 @@
 		<p align="center" id="title-bar" hidden><b>!PreReQ GrApH!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b><input align="right" type="text" id="course" onkeyup="userInput()"></center></p>
         <p id="loading-text">LOADING</p>
 
-        <script> 
-		
-		function userInput(){
-			var input=document.getElementById("course").value;
-			console.log(input);
-			var subject="CS";
-			var courseCode="380";
-			for (var i=0;i<input.length;i++){
-				if (!isNaN(input.substr(i,1))){		//substring is a number
-					subject=input.substr(0,i);
-					courseCode=input.substr(i,input.length);
-					break;
-				}
-			}
-			console.log(subject+" "+courseCode);
-			//example usage of getAllCourses
-			waterlooDAL.getAllCourses(function(courses){
-				console.log(courses);
-			});
-			
-			if (input!="" && input!=null){
-				var children=new Array();
-				function getAllPreq(data){
-					if (data!=null){
-						for (var i=0;i<data.prerequisites_parsed.length;i++){
-							if (isArray(data.prerequisites_parsed[i])){
-								getAllPreq(data.prerequisites_parsed[i]);
-							}
-							else{
-								children.push(data.prerequisites_parsed[i]);
-							}
-						}
-					}
-				}
-				waterlooDAL.getPreq(subject,courseCode,function(data){
-					console.log(data);
-					getAllPreq(data);
-					for(var i = 0; i < data.length; i++){
-						if(data[i].hasOwnProperty("prerequisites_parsed")){
-							data[i]["children"] = data[i]["prerequisites_parsed"];
-							delete data[i]["prerequisites_parsed"];
-						}
-					}
-				});
-			}
-		}
-		
-		function isArray(object) {
-			return Object.prototype.toString.call(object) === '[object Array]';
-		}
-		
-		
-		
+        <script>
+        //waterlooDAL.getAllCourses( function(data) { console.log(data); });
+        waterlooDAL.getPreqs("ECE","124",function(data) {console.log(data);} ); 
 		
         </script>
          <!--content-->
@@ -88,7 +38,7 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
         <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
         <script src="js/plugins.js"></script>
-        <script src="js/main.js"></script>
+        <!--script src="js/main.js"></script-->
         
         <!-- Add your site or application content here -->
         
