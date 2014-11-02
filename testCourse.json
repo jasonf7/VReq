@@ -1,0 +1,11 @@
+{"name" : "CS488", "children" : [
+    {"name" : "SE240", "children": [
+        {"name" : "SE212"},
+        {"name" : "STAT206"}
+    ]},
+    {"name" : "CS370", "children": [
+        {"name" : "MATH138"},
+        {"name" : "MATH136"},
+        {"name" : "CS241"}
+    ]}
+]}
