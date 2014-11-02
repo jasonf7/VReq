@@ -1,4 +1,4 @@
-{"name" : "CS488", "children" : [
+{"name" : "CS488", "title" : "Intro to Graphics", "description" : "Zuqi mark booster", "children" : [
     {"name" : "SE240", "children": [
         {"name" : "SE212"},
         {"name" : "STAT206"}
