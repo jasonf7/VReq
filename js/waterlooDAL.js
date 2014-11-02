@@ -14,7 +14,7 @@ var waterlooDAL = (function() {
 	, STP:"St. Paul's University College"
 	, THL:"Theology"
 	, VPA:"Interdisciplinary Studies"
-	};
+};
 
 	// Returns an object that contains arrays of the courses for each subject.
 	// Example object usage: courses['ART']
@@ -77,37 +77,102 @@ var waterlooDAL = (function() {
 					}
 				}
 			});
-		};
+};
 
-		var getAllUnits = function (callback) {
-			$.ajax({
-				url: "https://api.uwaterloo.ca/v2/codes/units.json?key=bbfc4cd8d33601c406f5b5cadfae58b2",
-				dataType: 'json',
-				async: true,
-				success: function(data) {
-					var unitsToGroupDict = {};
-					for (var i=0; i<data.data.length; i++) {
-						unitsToGroupDict[data.data[i].unit_code] = data.data[i].group_code;
-					}
-					callback(unitsToGroupDict);
-				}
-			});
+var getAllUnits = function (callback) {
+	$.ajax({
+		url: "https://api.uwaterloo.ca/v2/codes/units.json?key=bbfc4cd8d33601c406f5b5cadfae58b2",
+		dataType: 'json',
+		async: true,
+		success: function(data) {
+			var unitsToGroupDict = {};
+			for (var i=0; i<data.data.length; i++) {
+				unitsToGroupDict[data.data[i].unit_code] = data.data[i].group_code;
+			}
+			callback(unitsToGroupDict);
 		}
-		getAllUnits(buildCoursesObject);
-	}
-	
-	var getPreq= function getPreq(subject,courseCode,callback){
-		$.getJSON("https://api.uwaterloo.ca/v2/courses/"+subject+"/"+courseCode+"/prerequisites.json?key=bbfc4cd8d33601c406f5b5cadfae58b2", function(jd,status, jqXHR) {
-			callback(jd.data);
-		});
-	
-	}
+	});
+}
+getAllUnits(buildCoursesObject);
+}
 
-	return {
-		getAllCourses: getAllCourses,
-		getPreq: getPreq
-		
-	};
+var getPreqs = function getPreqs(courseSubject, courseNumber, callback) {
+	// we have original name here
+	var promises = [];
+	var prereqs = [];
+
+	promises.push(helper(prereqs, courseSubject, courseNumber, promises)); //either pass info about initial here, or ajax call again in final
+
+	$.when.apply($, promises).then(function(){
+		// build data here
+		callback(prereqs);
+	});
+
+	function helper(originPointer, courseSubject, courseNumber, promises) { //origin pointer can point to array, build object right before callback (on recursive exit)
+		var dfd = new $.Deferred();
+
+		$.ajax({
+			url: "https://api.uwaterloo.ca/v2/courses/"+courseSubject+"/"+courseNumber+"/prerequisites.json?key=bbfc4cd8d33601c406f5b5cadfae58b2",
+			dataType: 'json',
+			async: true,
+			success: function(data) {
+
+				//helper(data.data.prerequisites_parsed,callback);
+				//now we have info about first thing, and strings of its pre-reqs
+
+				// for each pre-req
+					// if pre-req is a list, go through each pre-req, and call helper on it
+					//else, add it to array
+
+				//what is the exit condition?
+				// if pre-reqs == "", do nothing
+
+				//how do we know when it is done?
+
+				if (data.data.prerequisites_parsed == null) { //empty
+					dfd.resolve(); //done this branch
+				}
+				else {
+					recurseThroughArray(originPointer, courseSubject, courseNumber, promises, data.data.prerequisites_parsed);
+				}
+			}
+		});
+		return dfd.promise(); // RETURN
+
+		function recurseThroughArray(originPointer, courseSubject, courseNumber, promises, arr) { 
+			if (Object.prototype.toString.call(arr) === '[object Array]') {
+				console.log("it is an array" + arr);
+				for (var i=0; i<arr.length; ++i) {
+					recurseThroughArray(originPointer, courseSubject, courseNumber, promises, arr[i]);
+				}
+			}
+			else if (arr != parseInt(arr, 10)) {
+				console.log("it is not an int or array " + arr);
+				var indexOfFirstDigit = arr.search(/\d/);
+				var subj = arr.substring(0, indexOfFirstDigit);
+				var cat_num = arr.substring(indexOfFirstDigit, arr.length);
+				promises.push(helper(originPointer, subj, cat_num, promises));
+			}
+			else if ((arr == parseInt(arr, 10))) { //if int
+				//skip
+			}
+			else {
+				console.log("error state");
+				//promises.push(helper(originPointer, arr.subject, arr.catalog_number, promises)); //wil crash here because args
+			}
+		}
+	}	 
+}
+
+
+
+
+
+return {
+	getAllCourses: getAllCourses,
+	getPreqs: getPreqs
+
+};
 
 })();
 
