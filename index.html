@@ -26,13 +26,64 @@
 
         <!-- Add your site or application content here -->
         <p>Hello world! This is HTML5 Boilerplate.</p>
+		
+		<input type="text" id="course" onkeyup="userInput()" >
 
         
         <script> 
-        //example usage of getAllCourses
-        waterlooDAL.getAllCourses(function(courses){
-            console.log(courses);
-        });
+		
+		function userInput(){
+			var input=document.getElementById("course").value;
+			console.log(input);
+			var subject="CS";
+			var courseCode="380";
+			for (var i=0;i<input.length;i++){
+				if (!isNaN(input.substr(i,1))){		//substring is a number
+					subject=input.substr(0,i);
+					courseCode=input.substr(i,input.length);
+					break;
+				}
+			}
+			console.log(subject+" "+courseCode);
+			//example usage of getAllCourses
+			waterlooDAL.getAllCourses(function(courses){
+				console.log(courses);
+			});
+			
+			if (input!="" && input!=null){
+				var children=new Array();
+				function getAllPreq(data){
+					if (data!=null){
+						for (var i=0;i<data.prerequisites_parsed.length;i++){
+							if (isArray(data.prerequisites_parsed[i]){
+								getAllPreq(data.prerequisites_parsed[i]);
+							}
+							else{
+								children.push(data.prerequisites_parsed[i]);
+							}
+						}
+					}
+				}
+				waterlooDAL.getPreq(subject,courseCode,function(data){
+					console.log(data);
+					getAllPreq(data);
+					for(var i = 0; i < data.length; i++){
+						if(data[i].hasOwnProperty("prerequisites_parsed")){
+							data[i]["children"] = data[i]["prerequisites_parsed"];
+							delete data[i]["prerequisites_parsed"];
+						}
+					}
+				});
+			}
+		}
+		
+		function isArray(object) {
+			return Object.prototype.toString.call(object) === '[object Array]';
+		}
+		
+		
+		
+		
         </script>
 
 
