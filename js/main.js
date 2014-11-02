@@ -18,6 +18,13 @@ var height = ($(window).height()/1.12) - margin.top - margin.bottom;
 var dx=width/24;
 var dy=height/8;
 
+var CPM,svg,tree,root,xaxis,yaxis;
+
+var xAxisScale,xBlandScale,yAxisScale,yBlandScale;
+var gx,gy;
+
+var maxDepth,duration,diagonal, i=0;
+
 function getFacInt(facString){
     var name = "_"+facString;
     return window[name];
@@ -32,76 +39,81 @@ function getRandCoord(faculty, year){
     return coord;
 }   
 
-var xAxisScale = d3.scale.ordinal().domain(["AHS","ART","CGC","ENG","ENV","IS","MAT","REN","SCI","STJ","STP","VPA"]).rangeBands([0,width]);
-var shiityScale = d3.scale.ordinal().domain(["","","","","","","","","","","",""]).range([0,width]);
-var yAxisScale = d3.scale.ordinal().domain([4,3,2,1]).rangeBands([height, 0]);
-var xaxis = d3.svg.axis()
-            .orient("bottom")
-            .scale(xAxisScale);
-var yaxis = d3.svg.axis()
-            .orient("left")
-            .scale(yAxisScale);
-var svg = d3.select("body").append("svg")
-    .attr("width", width+margin.left+margin.right)
-    .attr("height", height+margin.bottom+margin.top+10)
-  .append("g")
-    .attr("transform", "translate("+margin.left+","+margin.top+")");
-var gx = svg.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xaxis);
-var gy = svg.append("g")
-    .attr("class", "axis")
-    .call(yaxis);
 
-var CPM=new Array();
-for(var i=0; i<12; i++){
-    CPM[i]=new Array();
-}
+function createGraph(){
+	xAxisScale = d3.scale.ordinal().domain(["AHS","ART","CGC","ENG","ENV","IS","MAT","REN","SCI","STJ","STP","VPA"]).rangeBands([0,width]);
+	xBlandScale = d3.scale.ordinal().domain(["","","","","","","","","","","",""]).range([0,width]);
+	yAxisScale = d3.scale.ordinal().domain([4,3,2,1]).rangeBands([height, 0]);
+	yBlandScale = d3.scale.ordinal().domain(["","","",""]).range([height, 0]);
+	xaxis = d3.svg.axis()
+	            .orient("bottom")
+	            .scale(xAxisScale);
+	yaxis = d3.svg.axis()
+	            .orient("left")
+	            .scale(yAxisScale);
+	svg = d3.select("body").append("svg")
+	    .attr("width", width+margin.left+margin.right)
+	    .attr("height", height+margin.bottom+margin.top+10)
+	  .append("g")
+	    .attr("transform", "translate("+margin.left+","+margin.top+")");
+	gx = svg.append("g")
+	    .attr("class", "axis")
+	    .attr("transform", "translate(0," + height + ")")
+	    .call(xaxis);
+	gy = svg.append("g")
+	    .attr("class", "axis")
+	    .call(yaxis);
 
-for(var i=0; i<12; i++){
-    for(var j=0; j<4; j++){
-        var xVal = dx+dx*2*i;
-        var yVal = dy+dy*2*j;
-        var coord = {x: xVal, y: yVal};
-        CPM[i][j]=coord;
-        console.log(i+ "," + j + ": (" + xVal + "," + yVal + ")");
-        /*svg.append("circle")
-                .attr("cx", coord.x)
-                .attr("cy", coord.y)
-                .attr("r", 2);*/
-    }
-}
-
-var tree = d3.layout.tree().size([width,height]);
-var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.x, (height-d.y)]; });
-var duration = 750;
-var root;
-var maxDepth=0;
-
-
-d3.json("testCourse.json", function(error, flare){
-	console.log(flare);
-	root=flare;
-	root.x0 = width/2;
-	root.y0 = 25;
-	tree.nodes(root).forEach(function(d) { if(d.depth > maxDepth) maxDepth = d.depth; });
-	function collapse(d){
-		if(d.children){
-			d._children = d.children;
-			d._children.forEach(collapse);
-			d.children = null;
-		}
+	CPM=new Array();
+	for(var i=0; i<12; i++){
+	    CPM[i]=new Array();
 	}
 
-	root.children.forEach(collapse);
-	console.log(root);
-	update(root);
-});
+	for(var i=0; i<12; i++){
+	    for(var j=0; j<4; j++){
+	        var xVal = dx+dx*2*i;
+	        var yVal = dy+dy*2*j;
+	        var coord = {x: xVal, y: yVal};
+	        CPM[i][j]=coord;
+	        console.log(i+ "," + j + ": (" + xVal + "," + yVal + ")");
+	        /*svg.append("circle")
+	                .attr("cx", coord.x)
+	                .attr("cy", coord.y)
+	                .attr("r", 2);*/
+	    }
+	}
+}
+
+function createTree(){
+	tree = d3.layout.tree().size([width,height]);
+	diagonal = d3.svg.diagonal()
+	    .projection(function(d) { return [d.x, (height-d.y)]; });
+	duration = 750;
+	maxDepth=0;
+
+
+	d3.json("testCourse.json", function(error, flare){
+		console.log(flare);
+		root=flare;
+		root.x0 = width/2;
+		root.y0 = 25;
+		tree.nodes(root).forEach(function(d) { if(d.depth > maxDepth) maxDepth = d.depth; });
+		function collapse(d){
+			if(d.children){
+				d._children = d.children;
+				d._children.forEach(collapse);
+				d.children = null;
+			}
+		}
+
+		root.children.forEach(collapse);
+		collapse(root);
+		console.log(root);
+		update(root);
+	});
+}
 
 function update(source) {
-
   // Compute the new tree layout.
   var nodes = tree.nodes(root),
       links = tree.links(nodes);
@@ -208,7 +220,10 @@ function click(d) {
 
 waterlooDAL.getAllCourses(function(courses){
     console.log(courses);
-
+    $("#title-bar").show();
+    $("#loading-text").hide();
+    createGraph();
+    createTree();
     var nodes = []
     var force = d3
     for(fac in courses) {
@@ -270,10 +285,10 @@ waterlooDAL.getAllCourses(function(courses){
 					.attr("r", 2.5)
 					.duration(2000); // this is 1s	
 	
-   	xaxis.scale(xBlandScale)
+   	/*xaxis.scale(xBlandScale)
    	gx.call(xaxis)
 	yaxis.scale(yBlandScale)
-   	gy.call(yaxis)
+   	gy.call(yaxis)*/
 	/*
 	xaxis.scale(xAxisScale);
    	gx.call(xaxis);

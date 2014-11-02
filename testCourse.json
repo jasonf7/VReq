@@ -6,6 +6,7 @@
     {"name" : "CS370", "children": [
         {"name" : "MATH138"},
         {"name" : "MATH136"},
-        {"name" : "CS241"}
+        {"name" : "CS241"},
+        {"name" : "STAT206"}
     ]}
 ]}
