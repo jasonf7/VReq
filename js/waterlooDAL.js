@@ -128,9 +128,7 @@ var getPreqs = function getPreqs(courseSubject, courseNumber, callback) {
 	        setTimeout(timerFunction, 200);
 	    }
 	    else {
-	    	console.log(prereqs);
-	    	console.log(JSON.stringify(prereqs));
-	    	console.log("finished all");
+	    	callback(prereqs);
 	    }
 	}
 	timerFunction();
@@ -140,7 +138,7 @@ var getPreqs = function getPreqs(courseSubject, courseNumber, callback) {
 		$.ajax({
 			url: "https://api.uwaterloo.ca/v2/courses/"+courseSubject+"/"+courseNumber+"/prerequisites.json?key=bbfc4cd8d33601c406f5b5cadfae58b2",
 			dataType: 'json',
-			async: false,
+			async: true,
 			success: function(data) {
 				if (data === undefined || data.data.prerequisites_parsed == null || data.data.prerequisites_parsed == "") { //empty
 					// dfd.resolve(); //done this branch

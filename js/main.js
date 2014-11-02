@@ -140,7 +140,7 @@ function collapse(d){
 }
 
 function createTree(){
-	console.log("HELLO");
+
 	tree = d3.layout.tree().size([width,height]);
 	diagonal = d3.svg.diagonal()
 	    .projection(function(d) { return [d.x, (height-d.y)]; });
@@ -148,33 +148,15 @@ function createTree(){
 	maxDepth=0;
 
 
-	d3.json("testCourse.json", function(error, flare){
-		var manig = {"name" : "CS488", "title" : "Intro to Graphics", "description" : "Zuqi mark booster", "children" : [
-		    {"name" : "SE240", "children": [
-		        {"name" : "SE212"},
-		        {"name" : "STAT206"}
-		    ]},
-		    {"name" : "CS370", "children": [
-		        {"name" : "MATH138"},
-		        {"name" : "MATH136"},
-		        {"name" : "CS241"},
-		        {"name" : "STAT206"}
-		    ]}
-		]};
-		console.log(flare);
-		root=manig;
-		//root=flare;
-		root.x0 = width/2;
-		root.y0 = 25;
-		tree.nodes(root).forEach(function(d) { 
-			if(d.depth > maxDepth) maxDepth = d.depth;
-		});
-
-		//root.children.forEach(collapse);
-		//collapse(root);
-		console.log(root);
-		update(root);
+	root.x0 = width/2;
+	root.y0 = 25;
+	tree.nodes(root).forEach(function(d) { 
+		if(d.depth > maxDepth) maxDepth = d.depth;
 	});
+
+	//root.children.forEach(collapse);
+	//collapse(root);
+	update(root);
 }
 
 function update(source) {
@@ -350,6 +332,25 @@ function transitionOut(){
 	},3000);	
 }
 
+function renderTree(subj, cat_num){
+	waterlooDAL.getPreqs(subj, cat_num, function(data){
+		console.log(data);
+		if(root){
+			transitionOut();
+		}
+		
+		root=data;
+		transitionIn(function (){
+	   		createTree();
+	   		xaxis.scale(xBlandScale)
+	   		gx.call(xaxis)
+		    yaxis.scale(yBlandScale)
+	   	    gy.call(yaxis)
+	   		//svg.selectAll("g.node").data(treeNodes).exit().remove();
+	   	});
+	});
+}
+
 waterlooDAL.getAllCourses(function(courses){
 	setRandColors();
     console.log(courses);
@@ -391,14 +392,14 @@ waterlooDAL.getAllCourses(function(courses){
 					  
 	   	
 
-   	transitionIn(function (){
+   	/*transitionIn(function (){
    		createTree();
    		xaxis.scale(xBlandScale)
    		gx.call(xaxis)
 	    yaxis.scale(yBlandScale)
    	    gy.call(yaxis)
    		//svg.selectAll("g.node").data(treeNodes).exit().remove();
-   	});
+   	});*/
 				
    	/*xaxis.scale(xBlandScale)
    	gx.call(xaxis)
