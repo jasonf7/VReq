@@ -209,7 +209,7 @@ function click(d) {
 waterlooDAL.getAllCourses(function(courses){
     console.log(courses);
 
-/*    var nodes = []
+    var nodes = []
     var force = d3
     for(fac in courses) {
         for(var i=0; i< courses[fac].length; i++){
@@ -228,23 +228,56 @@ waterlooDAL.getAllCourses(function(courses){
         .charge(0)
         .gravity(0)
         .size([width+margin.left+margin.right,height+margin.bottom+margin.top+10]);
+		
+   	force.nodes(nodes).start();
 
-    force.nodes(nodes).start();
+   	var node = svg.selectAll(".node")
+   					.data(nodes)
+   				  .enter().append("circle")
+					.attr("r", 0)
+   				    .attr("class", function(d) {return d.subject.concat(d.catalog_number).concat(" node"); })
+   				    .attr("cx", function(d) {return d.x; })
+   				    .attr("cy", function(d) {return d.y; })
+					.transition()
+					.attr("r", 2.5)
+					.duration(2000);
 
-    var node = svg.selectAll(".node")
-                    .data(nodes)
-                  .enter().append("circle")
-                    .attr("class", "node")
-                    .attr("r", 2.5)
-                    .attr("cx", function(d) { console.log(d.x); return d.x; })
-                    .attr("cy", function(d) { console.log(d.y); return d.y; })
-                    .call(force.drag);
-
-    force.on("tick", function(){
-
-    });*/
-
-
-    //xaxis.scale(shiityScale);
-    //gx.call(xaxis);
+	var node = svg.selectAll(".node")
+   					.transition()
+					.delay(2000) // this is 1s
+					.attr("r", 1)
+					.duration(2000); // this is 1s
+					
+	var node = svg.select(".CS488")
+					.transition()
+					.delay(4000)
+					.attr("r", 15)
+					.attr("cx",width/2)
+					.attr("cy",height-margin.bottom-margin.top)
+					.duration(2000); // this is 1s
+				
+	var node = svg.select(".CS488")
+					.transition()
+					.delay(6000)
+					.attr("r", 1)
+					.attr("cx",function(d) {return d.x; })
+					.attr("cy",function(d) {return d.y; })
+					.duration(2000); // this is 1s			
+				
+	var node = svg.selectAll(".node")
+   					.transition()
+					.delay(8000)
+					.attr("r", 2.5)
+					.duration(2000); // this is 1s	
+	
+   	xaxis.scale(xBlandScale)
+   	gx.call(xaxis)
+	yaxis.scale(yBlandScale)
+   	gy.call(yaxis)
+	/*
+	xaxis.scale(xAxisScale);
+   	gx.call(xaxis);
+	yaxis.scale(yBlandScale);
+   	gy.call(yaxis);
+	*/
 });

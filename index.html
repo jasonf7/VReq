@@ -50,7 +50,7 @@
 				function getAllPreq(data){
 					if (data!=null){
 						for (var i=0;i<data.prerequisites_parsed.length;i++){
-							if (isArray(data.prerequisites_parsed[i]){
+							if (isArray(data.prerequisites_parsed[i])){
 								getAllPreq(data.prerequisites_parsed[i]);
 							}
 							else{
