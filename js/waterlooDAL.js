@@ -39,6 +39,12 @@ var waterlooDAL = (function() {
 					}
 
 					$.when.apply($, promises).then(function(){
+
+						// for (var property in groupsDict) {
+						//     if (object.hasOwnProperty(property)) {
+						//         for(loop through courses[property])
+						//     }
+						// }
 						callback(courses);
 					});
 
@@ -47,11 +53,22 @@ var waterlooDAL = (function() {
 						var deferred = new $.Deferred();
 
 						$.getJSON("https://api.uwaterloo.ca/v2/courses/"+subject.subject+".json?key=bbfc4cd8d33601c406f5b5cadfae58b2", function(data) {
-
-							courses[unitsToGroupDict[subject.unit]] = data.data;
-							for (var i=0; i<courses[unitsToGroupDict[subject.unit]].length; ++i) {
-								courses[unitsToGroupDict[subject.unit]][i]['full_name'] = groupsDict[unitsToGroupDict[subject.unit]];
+							// cocatenates to array if it is not empty
+							if (unitsToGroupDict[subject.unit] in courses) {
+								courses[unitsToGroupDict[subject.unit]] = courses[unitsToGroupDict[subject.unit]].concat(data.data.filter(function(el) {
+									return el.academic_level == "undergraduate";
+								}));
 							}
+							else {
+								courses[unitsToGroupDict[subject.unit]] = data.data.filter(function(el) {
+									return el.academic_level == "undergraduate";
+								});
+							}
+
+							// adds full name key to array ( move to code before fallback) TODO
+							// for (var i=0; i<courses[unitsToGroupDict[subject.unit]].length; ++i) {
+							// 	courses[unitsToGroupDict[subject.unit]][i]['full_name'] = groupsDict[unitsToGroupDict[subject.unit]];
+							// }
 
 							deferred.resolve();
 						})
