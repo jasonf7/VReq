@@ -95,9 +95,18 @@ var waterlooDAL = (function() {
 		}
 		getAllUnits(buildCoursesObject);
 	}
+	
+	var getPreq= function getPreq(subject,courseCode,callback){
+		$.getJSON("https://api.uwaterloo.ca/v2/courses/"+subject+"/"+courseCode+"/prerequisites.json?key=bbfc4cd8d33601c406f5b5cadfae58b2", function(jd,status, jqXHR) {
+			callback(jd.data);
+		});
+	
+	}
 
 	return {
-		getAllCourses: getAllCourses
+		getAllCourses: getAllCourses,
+		getPreq: getPreq
+		
 	};
 
 })();
