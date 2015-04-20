@@ -10,4 +10,4 @@ A demo of the application can be found [here](http://jasonf7.github.io/).
 - Clement Hoang [(Clemmy)](https://github.com/Clemmy/TSimulator/issues)
 - Jason Fang [(jasonf7)](https://github.com/jasonf7)
 - Tony Lu [(tlulu)](https://github.com/tlulu)
-- Zuqi Li [(lizuqiliang)](https://github.com/lizuqiliang)
+- Zuqi Li [(zuqini)](https://github.com/zuqini)
